@@ -1,27 +1,18 @@
-name := "nightcoreplayer"
-version := "1.0.0-SNAPSHOT"
-
-scalaVersion := "2.12.5"
-
-scalacOptions ++= Seq(
-  "-feature",
-  "-deprecation",
-  "-unchecked",
-  "-encoding",
-  "UTF-8",
-  "-language:_",
-  "-Ywarn-adapted-args",
-  "-Ywarn-dead-code",
-  "-Ywarn-inaccessible",
-  "-Ywarn-infer-any",
-  "-Ywarn-nullary-override",
-  "-Ywarn-nullary-unit",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-unused",
-  "-Ywarn-unused-import"
+lazy val commonSettings = Seq(
+  version := "1.0.0-SNAPSHOT",
+  scalaVersion := "2.12.4",
+  test in assembly := {}
 )
 
-libraryDependencies ++= Seq(
-  "org.apache.tika" % "tika-core"  % "1.17",
-  "org.scalatest"   %% "scalatest" % "3.0.5" % Test
-)
+lazy val app = (project in file("."))
+  .settings(commonSettings: _*)
+  .settings(
+    mainClass in assembly := Some("nightcoreplayer.Main"),
+    assemblyJarName in assembly := "nightcoreplayer.jar",
+    unmanagedJars in Compile += {
+      sys.props
+      val sysprops = new sys.SystemProperties
+      val jh       = sysprops("java.home")
+      Attributed.blank(file(jh) / "lib/ext/jfxrt.jar")
+    }
+  )
