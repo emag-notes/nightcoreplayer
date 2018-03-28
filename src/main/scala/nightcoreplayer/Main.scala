@@ -5,10 +5,12 @@ import java.io.File
 import javafx.application.Application
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.FXCollections
+import javafx.event.{ActionEvent, Event, EventHandler}
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.{Label, TableColumn, TableRow, TableView}
+import javafx.scene.control._
+import javafx.scene.image.{Image, ImageView}
 import javafx.scene.input.{DragEvent, MouseEvent, TransferMode}
 import javafx.scene.layout.{BorderPane, HBox}
 import javafx.scene.media.{Media, MediaPlayer, MediaView}
@@ -33,7 +35,7 @@ class Main extends Application {
     val timeLabel = new Label()
     timeLabel.setTextFill(Color.WHITE)
 
-    val toolBar = new HBox(timeLabel)
+    val toolBar = new HBox()
     toolBar.setMinHeight(toolBarMinHeight)
     toolBar.setAlignment(Pos.CENTER)
     toolBar.setStyle("-fx-background-color: Black")
@@ -65,6 +67,35 @@ class Main extends Application {
       new DeleteCell(movies, mediaView, tableView)
     })
     tableView.getColumns.setAll(fileNameColumn, timeColumn, deleteActionColumn)
+
+    // play button
+    val playButtonImage = new Image(getClass.getResourceAsStream("play.png"))
+    val playButton      = new Button()
+    playButton.setGraphic(new ImageView(playButtonImage))
+    playButton.setStyle("-fx-background-color: Black")
+    playButton.setOnAction((_: ActionEvent) => {
+      val selectionModel = tableView.getSelectionModel
+      if (mediaView.getMediaPlayer != null & !selectionModel.isEmpty) {
+        mediaView.getMediaPlayer.play()
+      }
+    })
+    playButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+                               (_: MouseEvent) => playButton.setStyle("-fx-body-color: Black"))
+    playButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+                               (_: MouseEvent) => playButton.setStyle("-fx-background-color: Black"))
+
+    // pause button
+    val pauseButtonImage = new Image(getClass.getResourceAsStream("pause.png"))
+    val pauseButton      = new Button()
+    pauseButton.setGraphic(new ImageView(pauseButtonImage))
+    pauseButton.setStyle("-fx-background-color: Black")
+    pauseButton.setOnAction((_: ActionEvent) => if (mediaView.getMediaPlayer != null) mediaView.getMediaPlayer.pause())
+    pauseButton.addEventHandler(MouseEvent.MOUSE_ENTERED,
+                                (_: MouseEvent) => pauseButton.setStyle("-fx-body-color: Black"))
+    pauseButton.addEventHandler(MouseEvent.MOUSE_EXITED,
+                                (_: MouseEvent) => pauseButton.setStyle("-fx-background-color: Black"))
+
+    toolBar.getChildren.addAll(playButton, pauseButton, timeLabel)
 
     val baseBorderPane = new BorderPane()
     baseBorderPane.setStyle("-fx-background-color: Black")
