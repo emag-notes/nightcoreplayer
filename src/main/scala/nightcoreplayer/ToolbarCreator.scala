@@ -1,7 +1,11 @@
 package nightcoreplayer
 
+import java.lang
+
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.ActionEvent
 import javafx.geometry.Pos
+import javafx.scene.Scene
 import javafx.scene.control.{Label, TableView}
 import javafx.scene.layout.HBox
 import javafx.scene.media.MediaView
@@ -12,7 +16,11 @@ import nightcoreplayer.ToolButtonCreator.createButton
 
 object ToolbarCreator {
 
-  def create(mediaView: MediaView, tableView: TableView[Movie], timeLabel: Label, primaryStage: Stage): HBox = {
+  def create(mediaView: MediaView,
+             tableView: TableView[Movie],
+             timeLabel: Label,
+             scene: Scene,
+             primaryStage: Stage): HBox = {
     val toolBar = new HBox()
     toolBar.setMinHeight(toolBarMinHeight)
     toolBar.setAlignment(Pos.CENTER)
@@ -75,7 +83,30 @@ object ToolbarCreator {
     })
 
     // fullscreen button
-    val fullScreenButton = createButton("fullscreen.png", (_: ActionEvent) => primaryStage.setFullScreen(true))
+    val fullScreenButton = createButton(
+      "fullscreen.png",
+      (_: ActionEvent) => {
+        primaryStage.setFullScreen(true)
+        mediaView.fitHeightProperty().unbind()
+        mediaView.fitHeightProperty().bind(scene.heightProperty())
+        mediaView.fitWidthProperty().unbind()
+        mediaView.fitWidthProperty().bind(scene.widthProperty())
+      }
+    )
+
+    primaryStage
+      .fullScreenProperty()
+      .addListener(new ChangeListener[lang.Boolean] {
+        override def changed(observable: ObservableValue[_ <: lang.Boolean],
+                             oldValue: lang.Boolean,
+                             newValue: lang.Boolean): Unit =
+          if (!newValue) {
+            mediaView.fitHeightProperty().unbind()
+            mediaView.fitHeightProperty().bind(scene.heightProperty().subtract(toolBarMinHeight))
+            mediaView.fitWidthProperty().unbind()
+            mediaView.fitWidthProperty().bind(scene.widthProperty().subtract(tableMinWidth))
+          }
+      })
 
     toolBar.getChildren.addAll(firstButton,
                                backButton,
