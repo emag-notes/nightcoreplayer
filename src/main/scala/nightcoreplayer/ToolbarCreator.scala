@@ -1,15 +1,14 @@
 package nightcoreplayer
 
+import javafx.event.ActionEvent
 import javafx.geometry.Pos
-import javafx.scene.control.{Button, Label, TableView}
+import javafx.scene.control.{Label, TableView}
 import javafx.scene.layout.HBox
 import javafx.scene.media.MediaView
 import javafx.stage.Stage
-import SizeConstants._
-import javafx.event.{ActionEvent, EventHandler}
-import javafx.scene.image.{Image, ImageView}
-import javafx.scene.input.MouseEvent
 import javafx.util.Duration
+import nightcoreplayer.SizeConstants._
+import nightcoreplayer.ToolButtonCreator.createButton
 
 object ToolbarCreator {
 
@@ -87,17 +86,6 @@ object ToolbarCreator {
                                timeLabel)
 
     toolBar
-  }
-
-  private[this] def createButton(imagePath: String, eventHandler: EventHandler[ActionEvent]): Button = {
-    val buttonImage = new Image(getClass.getResourceAsStream(imagePath))
-    val button      = new Button()
-    button.setGraphic(new ImageView(buttonImage))
-    button.setStyle("-fx-background-color: Black")
-    button.setOnAction(eventHandler)
-    button.addEventHandler(MouseEvent.MOUSE_ENTERED, (_: MouseEvent) => button.setStyle("-fx-body-color: Black"))
-    button.addEventHandler(MouseEvent.MOUSE_EXITED, (_: MouseEvent) => button.setStyle("-fx-background-color: Black"))
-    button
   }
 
 }
